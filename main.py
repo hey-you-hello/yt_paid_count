@@ -15,8 +15,8 @@ def transform_money(txt):
         '£': 40.0,
         '¥': 0.25,
         '₱': 0.6,
-		"HK$":4.2207,
-		"A$":20.71
+        "HK$":4.2207,
+        "A$":20.71  # 修正字典縮進
     }
     #每天
     if 'MYR' in txt or 'SGD' in txt:
@@ -50,12 +50,20 @@ def transform_money(txt):
         print(f"格式錯誤: {txt}")
         return 0
 
+max_p=0
+max_p_data=None
 n_paid=0
+moneys=0  
 for n in data:
     if "paid" in n:
         n_paid+=1
         paid_data=json.loads(n)["paid"]
-        money+=transform_money(paid_data)
+        money=transform_money(paid_data)  
+        if money>max_p:
+            max_p=money  
+            max_p_data=n  
+        moneys+=money  
 
-print(f"總金額台幣: {money}")
+print(f"捐最多的人：{max_p_data}")
+print(f"總金額台幣: {moneys}")  
 print(f"付費條目數: {n_paid}")
