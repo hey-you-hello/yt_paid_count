@@ -7,63 +7,73 @@ data = StringIO(requests.get("https://dieddayofbattlecatserver.vercel.app/output
 money = 0
 
 def transform_money(txt):
-    exchange_rates = {
-        'NT$': 1.0,
-        'MYR': 7.44038,
-        'SGD': 22.0,
-        '₹': 0.4,
-        '£': 40.0,
-        '¥': 0.25,
-        '₱': 0.6,
-        "HK$":4.2207,
-        "A$":20.71  # 修正字典縮進
-    }
-    #每天
-    if 'MYR' in txt or 'SGD' in txt:
-        p=txt.split()
-        c=p[0]
-        amount_str=p[1].replace(',', '')
-        try:
-            amount=float(amount_str)
-        except ValueError:
-            print(f"失敗！！！: {txt}")
-            return 0
-        return amount * exchange_rates[c]
-    
-    #應該對？
-    match=re.match(r'^(\D+?)\s*([\d,.]+)$', txt)
-    if match:
-        currency_s=match.group(1).strip()
-        amount_s=match.group(2).replace(',', '')
-        try:
-            amount=float(amount_s)
-        except ValueError:
-            print(f"失敗: {txt}")
-            return 0
-        
-        rate=exchange_rates.get(currency_s, 0)
-        if rate == 0:
-            print(f"未找到貨幣符號 '{currency_s}'der匯率")
-            return 0
-        return amount * rate
-    else:
-        print(f"格式錯誤: {txt}")
-        return 0
+	exchange_rates = {
+		'NT$': 1.0,
+		'MYR': 7.44038,
+		'SGD': 22.0,
+		'₹': 0.4,
+		'£': 40.0,
+		'¥': 0.25,
+		'₱': 0.6,
+		"HK$": 4.2207,
+		"A$": 20.71,
+		"₩": 0.0236,
+		"$":32.0,
+		"CA$":22.8,
+		"€":36.22,
+		"ARS":0.0311,
+	}
 
-max_p=0
-max_p_data=None
-n_paid=0
-moneys=0  
+	if 'MYR' in txt or 'SGD' in txt:
+		p = txt.split()
+		c = p[0]
+		amount_str = p[1].replace(',', '')
+		try:
+			amount = float(amount_str)
+		except ValueError:
+			print(f"失敗！！！: {txt}")
+			return 0
+		return amount * exchange_rates[c]
+
+	# 應該對？
+	match = re.match(r'^(\D+?)\s*([\d,.]+)$', txt)
+	if match:
+		currency_s = match.group(1).strip()
+		amount_s = match.group(2).replace(',', '')
+		try:
+			amount = float(amount_s)
+		except ValueError:
+			print(f"失敗: {txt}")
+			return 0
+
+		rate = exchange_rates.get(currency_s, 0)
+		if rate == 0:
+			print(f"未找到貨幣符號 '{currency_s}'der匯率")
+			return 0
+		return amount * rate
+	else:
+		print(f"格式錯誤: {txt}")
+		return 0
+i=0
+max_p = 0
+max_p_data = None
+n_paid = 0
+moneys = 0
 for n in data:
-    if "paid" in n:
-        n_paid+=1
-        paid_data=json.loads(n)["paid"]
-        money=transform_money(paid_data)  
-        if money>max_p:
-            max_p=money  
-            max_p_data=n  
-        moneys+=money  
+	if "paid" in n:
+		
+		
+	
+		n_paid += 1
+		paid_data = json.loads(n)["paid"]
+		money = transform_money(paid_data)
+		
+		
+		if money > max_p:
+			max_p = money
+			max_p_data = n
+		moneys += money
 
 print(f"捐最多的人：{max_p_data}")
-print(f"總金額台幣: {moneys}")  
+print(f"總金額台幣: {moneys}")
 print(f"付費條目數: {n_paid}")
